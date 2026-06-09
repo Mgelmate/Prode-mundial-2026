@@ -222,7 +222,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-emblem">⚽</span>
@@ -236,7 +235,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <header class="app-header">
     <div class="header-inner">
@@ -273,20 +271,20 @@ const db = createClient(
   'sb_publishable_AYSZK28_mYPab9CDz9eigA_amZDfBB7'
 )
 
-// ─── DATOS ───────────────────────────────────────────────────────────────────
+// ─── DATOS (GRUPOS OFICIALES MUNDIAL 2026) ──────────────────────────────────
 const GRUPOS = {
-  A: ['México','EEUU','Canadá','Cuba'],
-  B: ['Argentina','Ecuador','Chile','Perú'],
-  C: ['Brasil','Uruguay','Colombia','Bolivia'],
-  D: ['España','Portugal','Marruecos','Angola'],
-  E: ['Francia','Bélgica','Eslovaquia','Gabón'],
-  F: ['Inglaterra','Países Bajos','Senegal','Togo'],
-  G: ['Alemania','Dinamarca','Serbia','Costa Rica'],
-  H: ['Italia','Croacia','Albania','Turquía'],
-  I: ['Japón','Corea del Sur','Arabia Saudita','Indonesia'],
-  J: ['Australia','Irán','Qatar','Uzbekistán'],
-  K: ['Sudáfrica','Nigeria','Ghana','Argelia'],
-  L: ['Egipto','Camerún','Costa de Marfil','Guinea'],
+  A: ['México','Sudáfrica','Corea del Sur','República Checa'],
+  B: ['Canadá','Bosnia y Herzegovina','Catar','Suiza'],
+  C: ['Brasil','Marruecos','Haití','Escocia'],
+  D: ['Estados Unidos','Paraguay','Australia','Turquía'],
+  E: ['Alemania','Curazao','Costa de Marfil','Ecuador'],
+  F: ['Países Bajos','Japón','Suecia','Túnez'],
+  G: ['Bélgica','Egipto','Irán','Nueva Zelanda'],
+  H: ['España','Cabo Verde','Arabia Saudita','Uruguay'],
+  I: ['Francia','Senegal','Irak','Noruega'],
+  J: ['Argentina','Argelia','Austria','Jordania'],
+  K: ['Portugal','RD Congo','Uzbekistán','Colombia'],
+  L: ['Inglaterra','Croacia','Ghana','Panamá'],
 }
 
 const PARTIDOS_GRUPOS = Object.entries(GRUPOS).flatMap(([g, equipos]) => {
