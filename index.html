@@ -231,7 +231,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-emblem">⚽</span>
@@ -250,7 +249,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <header class="app-header">
     <div class="header-inner">
@@ -333,14 +331,13 @@ const PARTIDOS_ELIM = [
 const TOTAL = PARTIDOS_GRUPOS.length + PARTIDOS_ELIM.length
 
 // ─── ESTADO ──────────────────────────────────────────────────────────────────
-let currentUser = null; // Guardará la sesión de Supabase
-let picks = {} // Guardará formato "2-1"
+let currentUser = null; 
+let picks = {} 
 let faseActiva = 'Grupos'
 let grupoActivo = 'Grupo A'
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.onload = async () => {
-  // Chequea si el usuario ya inició sesión antes
   const { data: { session } } = await db.auth.getSession()
   if (session) {
     currentUser = session.user
@@ -354,7 +351,7 @@ async function handleAuth(action) {
   const password = document.getElementById('pass-input').value
   const err = document.getElementById('login-error')
   
-  err.className = 'login-error' // resetea clases
+  err.className = 'login-error' 
   
   if (!email || password.length < 6) { 
     err.textContent = 'Ingresá un correo válido y una contraseña de al menos 6 caracteres.'; 
@@ -399,8 +396,22 @@ function mostrarApp() {
   document.getElementById('login-screen').style.display = 'none'
   const app = document.getElementById('app')
   app.style.display = 'flex'
-  // Mostrar la primera letra del correo como avatar
-  document.getElementById('user-badge').textContent = currentUser.email.charAt(0)
+  document.getElementById('user-badge').textContent = currentUser.email.charAt(0).toUpperCase()
+  
+  // 🔥 MODO SÚPER ADMIN ACTIVADO (Usando tu UID real) 🔥
+  if (currentUser.id && currentUser.id.toLowerCase() === 'e16ed8fe-e586-45dc-a4bf-d43b6c56e416'.toLowerCase()) {
+    if (!document.getElementById('btn-nav-admin')) {
+      const nav = document.querySelector('.header-nav');
+      const adminBtn = document.createElement('button');
+      adminBtn.className = 'nav-btn';
+      adminBtn.id = 'btn-nav-admin';
+      adminBtn.textContent = '⚙️ Admin';
+      adminBtn.style.color = '#d4af37'; 
+      adminBtn.onclick = () => alert('¡Bienvenido, Jefe! Acá va a ir el panel de control general.');
+      nav.appendChild(adminBtn);
+    }
+  }
+  
   cargarPicks()
 }
 
@@ -416,7 +427,6 @@ function mostrarVista(vista) {
 // ─── PICKS ────────────────────────────────────────────────────────────────────
 async function cargarPicks() {
   document.getElementById('vista-prode').innerHTML = '<div class="loading"><div class="loading-ball">⚽</div><p>Cargando tus picks...</p></div>'
-  // Ahora filtramos por el correo del usuario en lugar del nombre tipeado
   const { data, error } = await db.from('picks').select('partido_id,resultado').eq('usuario', currentUser.email)
   if (!error) data.forEach(r => picks[r.partido_id] = r.resultado)
   renderProde()
@@ -536,7 +546,6 @@ async function guardarPicks() {
   err.classList.add('hidden')
 
   const validPicks = obtenerPicksCompletos();
-  // Ahora pasamos el email en lugar de la variable usuario vieja
   const rows = validPicks.map(([partido_id, resultado]) => ({
     usuario: currentUser.email, partido_id, resultado, updated_at: new Date().toISOString()
   }))
@@ -573,7 +582,6 @@ async function cargarTabla() {
 
   const porUsuario = {}
   if (allPicks) allPicks.forEach(({ usuario: u, partido_id, resultado }) => {
-    // Para no mostrar el correo completo por privacidad en la tabla, mostramos el nombre antes del @
     const apodo = u.split('@')[0]
     if (!porUsuario[apodo]) porUsuario[apodo] = {}
     porUsuario[apodo][partido_id] = resultado
