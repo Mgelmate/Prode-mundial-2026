@@ -328,9 +328,9 @@ async function mostrarApp(){
 // ── TORNEO ────────────────────────────────────────────────────────────────────
 async function cargarTorneo(){
   const {data} = await db.from('usuarios_torneos')
-    .select('torneo_id, ligas(id, nombre_torneo, codigo_acceso, admin_id)')
+    .select('torneo_id, ligas!usuarios_torneos_torneo_id_fkey(id, nombre_torneo, codigo_acceso, admin_id)')
     .eq('usuario_email', currentUser.email)
-    .limit(1).single()
+    .limit(1).maybeSingle()
 
   if(data?.ligas){
     torneoActivo = data.ligas
@@ -414,15 +414,16 @@ async function crearTorneo(){
     nombre_torneo: nombre,
     codigo_acceso: codigo,
     admin_id: currentUser.email
-  }).select().single()
+  }).select('id, nombre_torneo, codigo_acceso, admin_id').single()
 
   if(error){mostrarMsg(msg,'Error al crear: '+error.message,'error');return}
 
-  // Unir al creador
-  await db.from('usuarios_torneos').insert({
+  // Unir al creador (torneo_id es UUID)
+  const {error: e2} = await db.from('usuarios_torneos').insert({
     usuario_email: currentUser.email,
     torneo_id: liga.id
   })
+  if(e2){mostrarMsg(msg,'Error al unirse al torneo: '+e2.message,'error');return}
 
   torneoActivo=liga
   document.getElementById('header-liga-nombre').textContent=liga.nombre_torneo
@@ -447,12 +448,12 @@ async function unirseATorneo(){
   const {data:liga, error} = await db.from('ligas').select('*').eq('codigo_acceso',codigo).single()
   if(error||!liga){mostrarMsg(msg,'Código no encontrado. Verificá con quien te lo mandó.','error');return}
 
-  const {error:e2} = await db.from('usuarios_torneos').upsert({
+  const {error:e2} = await db.from('usuarios_torneos').insert({
     usuario_email: currentUser.email,
     torneo_id: liga.id
-  },{onConflict:'usuario_email,torneo_id'})
+  })
 
-  if(e2){mostrarMsg(msg,'Error al unirse: '+e2.message,'error');return}
+  if(e2 && !e2.message.includes('duplicate')){mostrarMsg(msg,'Error al unirse: '+e2.message,'error');return}
 
   torneoActivo=liga
   document.getElementById('header-liga-nombre').textContent=liga.nombre_torneo
@@ -572,7 +573,7 @@ async function guardarPicks(){
 
   const rows=Object.entries(picks).filter(([_,r])=>r&&r.includes('-')&&r.split('-').every(v=>v!=='')).map(([pid,res])=>({
     usuario_email: currentUser.email,
-    liga_id: torneoActivo?.id || null,
+    liga_id: torneoActivo ? torneoActivo.id : null,
     partido_id: pid,
     resultado: res,
     updated_at: new Date().toISOString()
