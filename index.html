@@ -277,6 +277,7 @@ const PARTIDOS_ELIM = [
 const TOTAL = PARTIDOS_GRUPOS.length + PARTIDOS_ELIM.length
 
 // ── ESTADO ────────────────────────────────────────────────────────────────────
+const SUPERADMIN = 'gustavobeltran8@gmail.com'
 let currentUser=null, torneoActivo=null, picks={}, resultadosOficiales={}
 let faseActiva='Grupos', grupoActivo='Grupo A'
 
@@ -310,13 +311,11 @@ async function mostrarApp(){
   document.getElementById('app').style.display='flex'
   document.getElementById('user-badge').textContent=currentUser.email.charAt(0).toUpperCase()
 
-  // Botón admin solo para el creador (primer usuario / vos)
-  // Lo detectamos chequeando si tiene algún torneo como admin
-  const {data:esAdmin} = await db.from('ligas').select('id').eq('admin_id',currentUser.email).limit(1)
-  if(esAdmin&&esAdmin.length>0 && !document.getElementById('btn-nav-admin')){
+  // Botón admin para el superadmin (vos)
+  if(currentUser.email === SUPERADMIN && !document.getElementById('btn-nav-admin')){
     const btn=document.createElement('button')
     btn.className='nav-btn'; btn.id='btn-nav-admin'
-    btn.innerHTML='⚙️'; btn.style.color=var_dorado||'#d4af37'
+    btn.innerHTML='⚙️'; btn.style.color='#d4af37'
     btn.onclick=()=>mostrarVista('admin')
     document.getElementById('main-nav').appendChild(btn)
   }
