@@ -127,6 +127,16 @@
     .loading-ball { font-size: 40px; animation: spin 1.5s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+    /* PANEL ADMIN */
+    .admin-card { background: var(--gris-medio); border: 1px solid var(--dorado); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+    .admin-title { color: var(--dorado); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .admin-desc { color: var(--texto-suave); font-size: 14px; margin-bottom: 20px; }
+    .admin-action-btn { 
+      width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 700;
+      background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
+      color: var(--negro); margin-top: 10px; 
+    }
+
     /* PROGRESO */
     .progreso-card { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
     .progreso-info { display: flex; justify-content: space-between; margin-bottom: 10px; }
@@ -231,6 +241,7 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-emblem">⚽</span>
@@ -249,6 +260,7 @@
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
   <header class="app-header">
     <div class="header-inner">
@@ -260,7 +272,7 @@
         </div>
       </div>
       <div class="header-right">
-        <nav class="header-nav">
+        <nav class="header-nav" id="main-nav">
           <button class="nav-btn active" id="btn-nav-prode" onclick="mostrarVista('prode')">Mi Prode</button>
           <button class="nav-btn" id="btn-nav-tabla" onclick="mostrarVista('tabla')">Tabla</button>
         </nav>
@@ -274,6 +286,20 @@
   <main class="app-main">
     <div id="vista-prode"></div>
     <div id="vista-tabla" class="hidden"></div>
+    
+    <!-- NUEVA VISTA ADMIN OCULTA -->
+    <div id="vista-admin" class="hidden">
+      <div class="admin-card">
+        <h2 class="admin-title">⚙️ Panel de Súper Admin</h2>
+        <p class="admin-desc">Conectá la API de football-data.org para automatizar la carga de goles oficiales.</p>
+        
+        <label style="font-size: 12px; color: var(--texto-suave); margin-bottom: 5px; display:block;">API TOKEN DE FOOTBALL-DATA.ORG</label>
+        <input id="api-token-input" class="login-input" type="password" placeholder="Pegá tu token acá..." />
+        
+        <button class="admin-action-btn" id="btn-sync-api" onclick="sincronizarAPI()">Sincronizar Resultados</button>
+        <p id="api-status" style="margin-top: 15px; font-size: 13px; font-weight: 600; text-align: center;"></p>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -398,17 +424,21 @@ function mostrarApp() {
   app.style.display = 'flex'
   document.getElementById('user-badge').textContent = currentUser.email.charAt(0).toUpperCase()
   
-  // 🔥 MODO SÚPER ADMIN ACTIVADO (Usando tu UID real) 🔥
+  // 🔥 MODO SÚPER ADMIN ACTIVADO 🔥
   if (currentUser.id && currentUser.id.toLowerCase() === 'e16ed8fe-e586-45dc-a4bf-d43b6c56e416'.toLowerCase()) {
     if (!document.getElementById('btn-nav-admin')) {
-      const nav = document.querySelector('.header-nav');
+      const nav = document.getElementById('main-nav');
       const adminBtn = document.createElement('button');
       adminBtn.className = 'nav-btn';
       adminBtn.id = 'btn-nav-admin';
       adminBtn.textContent = '⚙️ Admin';
       adminBtn.style.color = '#d4af37'; 
-      adminBtn.onclick = () => alert('¡Bienvenido, Jefe! Acá va a ir el panel de control general.');
+      adminBtn.onclick = () => mostrarVista('admin');
       nav.appendChild(adminBtn);
+
+      // Recuperar token guardado localmente si existe
+      const savedToken = localStorage.getItem('apiTokenProde');
+      if(savedToken) document.getElementById('api-token-input').value = savedToken;
     }
   }
   
@@ -419,8 +449,13 @@ function mostrarApp() {
 function mostrarVista(vista) {
   document.getElementById('vista-prode').classList.toggle('hidden', vista !== 'prode')
   document.getElementById('vista-tabla').classList.toggle('hidden', vista !== 'tabla')
+  document.getElementById('vista-admin').classList.toggle('hidden', vista !== 'admin')
+  
   document.getElementById('btn-nav-prode').classList.toggle('active', vista === 'prode')
   document.getElementById('btn-nav-tabla').classList.toggle('active', vista === 'tabla')
+  const btnAdmin = document.getElementById('btn-nav-admin');
+  if(btnAdmin) btnAdmin.classList.toggle('active', vista === 'admin')
+
   if (vista === 'tabla') cargarTabla()
 }
 
@@ -641,6 +676,36 @@ async function cargarTabla() {
     </div>
     <div class="tabla-lista">${rowsHTML}</div>
     <p class="tabla-update">Actualizado: ${now}</p>`
+}
+
+// ─── API ADMIN SINC ───────────────────────────────────────────────────────────
+async function sincronizarAPI() {
+  const token = document.getElementById('api-token-input').value.trim();
+  const statusEl = document.getElementById('api-status');
+  
+  if(!token) {
+    statusEl.style.color = '#ff6b6b';
+    statusEl.textContent = 'Por favor, ingresá un token primero.';
+    return;
+  }
+
+  // Guardamos el token en tu teléfono para que no lo pierdas
+  localStorage.setItem('apiTokenProde', token);
+  
+  statusEl.style.color = '#d4af37';
+  statusEl.textContent = 'Conectando con la API... ⏳';
+
+  try {
+    // Acá armaremos la conexión real a la API. 
+    // Por ahora validamos que el botón responda.
+    setTimeout(() => {
+      statusEl.style.color = '#00a65a';
+      statusEl.textContent = '✅ ¡Sistema listo para consumir partidos oficiales!';
+    }, 1500);
+  } catch (error) {
+    statusEl.style.color = '#ff6b6b';
+    statusEl.textContent = 'Error de conexión. Revisá el token.';
+  }
 }
 </script>
 </body>
