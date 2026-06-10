@@ -5,133 +5,218 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prode Mundial 2026</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --verde: #006847; --verde-claro: #00a65a;
-      --dorado: #d4af37; --dorado-claro: #f0d060;
-      --negro: #0d0d0d; --gris-oscuro: #1a1a2e; --gris-medio: #2d2d44;
-      --texto-suave: #8888aa; --blanco: #ffffff; --radius: 12px;
+      --verde:#006847;--verde-claro:#00a65a;--dorado:#d4af37;--dorado-claro:#f0d060;
+      --negro:#0d0d0d;--gris-oscuro:#1a1a2e;--gris-medio:#2d2d44;
+      --texto-suave:#8888aa;--blanco:#ffffff;--radius:12px;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: var(--gris-oscuro); color: var(--blanco); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    button { cursor: pointer; font-family: inherit; border: none; }
-    .hidden { display: none !important; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--gris-oscuro);color:var(--blanco);min-height:100vh;-webkit-font-smoothing:antialiased;}
+    button{cursor:pointer;font-family:inherit;border:none;}
+    input{font-family:inherit;}
+    .hidden{display:none!important;}
 
     /* LOGIN */
-    #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(ellipse at 20% 50%, rgba(0,104,71,0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(212,175,55,0.15) 0%, transparent 50%), var(--gris-oscuro); }
-    .login-card { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 48px 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 0 1px rgba(0,104,71,0.3); }
-    .login-emblem { font-size: 56px; margin-bottom: 16px; display: block; }
-    .login-title { font-size: 26px; font-weight: 900; letter-spacing: 0.12em; background: linear-gradient(135deg, var(--dorado), var(--dorado-claro)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
-    .login-sub { color: var(--texto-suave); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 32px; }
-    .login-input { width: 100%; padding: 14px 16px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: var(--blanco); font-size: 15px; outline: none; margin-bottom: 12px; }
-    .login-input:focus { border-color: var(--verde-claro); }
-    .auth-buttons { display: flex; gap: 10px; margin-top: 8px; }
-    .login-btn, .register-btn { flex: 1; padding: 14px; border-radius: 8px; font-size: 14px; font-weight: 700; }
-    .login-btn { background: linear-gradient(135deg, var(--verde), var(--verde-claro)); color: var(--blanco); }
-    .register-btn { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: var(--blanco); }
-    .login-error, .login-success { font-size: 13px; margin-bottom: 12px; font-weight: 600; }
-    .login-error { color: #ff6b6b; } .login-success { color: var(--verde-claro); }
+    #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+      background:radial-gradient(ellipse at 20% 50%,rgba(0,104,71,.25) 0%,transparent 60%),
+                 radial-gradient(ellipse at 80% 20%,rgba(212,175,55,.15) 0%,transparent 50%),var(--gris-oscuro);}
+    .login-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,.08);border-radius:20px;
+      padding:48px 32px;width:100%;max-width:400px;text-align:center;box-shadow:0 0 0 1px rgba(0,104,71,.3);}
+    .login-emblem{font-size:56px;margin-bottom:16px;display:block;}
+    .login-title{font-size:26px;font-weight:900;letter-spacing:.12em;
+      background:linear-gradient(135deg,var(--dorado),var(--dorado-claro));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+    .login-sub{color:var(--texto-suave);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:24px;}
+    .puntos-chips{display:flex;justify-content:center;gap:10px;margin-bottom:24px;}
+    .chip{background:rgba(0,104,71,.15);border:1px solid rgba(0,166,90,.2);border-radius:10px;padding:10px 14px;text-align:center;}
+    .chip-num{font-size:18px;font-weight:900;color:var(--dorado);display:block;}
+    .chip-label{font-size:9px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:.04em;}
+    .login-input{width:100%;padding:14px 16px;border-radius:8px;border:1.5px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);color:var(--blanco);font-size:15px;outline:none;margin-bottom:12px;}
+    .login-input:focus{border-color:var(--verde-claro);}
+    .login-input::placeholder{color:var(--texto-suave);}
+    .auth-buttons{display:flex;gap:10px;margin-top:8px;}
+    .login-btn,.register-btn{flex:1;padding:14px;border-radius:8px;font-size:14px;font-weight:700;}
+    .login-btn{background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:var(--blanco);}
+    .register-btn{background:transparent;border:1.5px solid rgba(255,255,255,.2);color:var(--blanco);}
+    .login-error{color:#ff6b6b;font-size:13px;margin-bottom:12px;font-weight:600;}
+    .login-success{color:var(--verde-claro);font-size:13px;margin-bottom:12px;font-weight:600;}
 
-    /* HEADER */
-    #app { display: none; flex-direction: column; min-height: 100vh; }
-    .app-header { background: var(--negro); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 100; }
-    .header-inner { max-width: 900px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .header-brand { display: flex; align-items: center; gap: 10px; }
-    .header-title { font-size: 15px; font-weight: 900; letter-spacing: 0.1em; background: linear-gradient(135deg, var(--dorado), var(--dorado-claro)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .header-sub { font-size: 9px; color: var(--texto-suave); letter-spacing: 0.08em; text-transform: uppercase; }
-    .header-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
-    .nav-btn { padding: 7px 13px; border-radius: 20px; font-size: 13px; font-weight: 600; background: transparent; color: var(--texto-suave); white-space: nowrap; }
-    .nav-btn.active { background: var(--verde); color: var(--blanco); }
-    .user-badge { width: 28px; height: 28px; background: var(--dorado); color: var(--negro); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; text-transform: uppercase; }
-    .logout-btn { background: transparent; color: var(--texto-suave); font-size: 12px; padding: 4px 6px; }
+    /* APP */
+    #app{display:none;flex-direction:column;min-height:100vh;}
+    .app-header{background:var(--negro);border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:100;}
+    .header-inner{max-width:900px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .header-brand{display:flex;align-items:center;gap:10px;}
+    .header-title{font-size:15px;font-weight:900;letter-spacing:.1em;
+      background:linear-gradient(135deg,var(--dorado),var(--dorado-claro));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .header-sub{font-size:9px;color:var(--texto-suave);letter-spacing:.08em;text-transform:uppercase;}
+    .header-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;}
+    .nav-btn{padding:7px 13px;border-radius:20px;font-size:13px;font-weight:600;background:transparent;color:var(--texto-suave);white-space:nowrap;}
+    .nav-btn.active{background:var(--verde);color:var(--blanco);}
+    .user-badge{width:28px;height:28px;background:var(--dorado);color:var(--negro);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;text-transform:uppercase;flex-shrink:0;}
+    .logout-btn{background:transparent;color:var(--texto-suave);font-size:12px;padding:4px 6px;}
+    .app-main{flex:1;padding:20px 16px 90px;max-width:900px;margin:0 auto;width:100%;}
 
-    /* MAIN */
-    .app-main { flex: 1; padding: 20px 16px 90px; max-width: 900px; margin: 0 auto; width: 100%; }
-    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 16px; color: var(--texto-suave); }
-    .loading-ball { font-size: 40px; animation: spin 1.5s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    /* LOADING */
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;color:var(--texto-suave);}
+    .loading-ball{font-size:40px;animation:spin 1.5s linear infinite;}
+    @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-    /* LIGAS / TORNEOS */
-    .ligas-card { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding: 24px; text-align: center; margin-bottom: 20px; }
-    .ligas-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--dorado); }
-    .ligas-desc { font-size: 14px; color: var(--texto-suave); margin-bottom: 24px; }
-    .ligas-btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--verde), var(--verde-claro)); color: var(--blanco); font-weight: 700; border-radius: 8px; margin-bottom: 12px; }
-    .ligas-btn-secondary { width: 100%; padding: 14px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: var(--blanco); font-weight: 700; border-radius: 8px; }
-    .torneo-activo-box { border: 2px dashed var(--dorado); padding: 20px; border-radius: 12px; background: rgba(212,175,55,0.05); }
-    .codigo-box { font-size: 24px; font-weight: 900; letter-spacing: 0.2em; color: var(--blanco); background: var(--negro); padding: 10px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+    /* LIGAS */
+    .ligas-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:20px;}
+    .ligas-title{font-size:20px;font-weight:800;margin-bottom:8px;color:var(--dorado);}
+    .ligas-desc{font-size:14px;color:var(--texto-suave);margin-bottom:24px;line-height:1.5;}
+    .ligas-btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:var(--blanco);font-weight:700;border-radius:8px;margin-bottom:12px;font-size:14px;}
+    .ligas-btn-secondary{width:100%;padding:14px;background:transparent;border:1.5px solid rgba(255,255,255,.2);color:var(--blanco);font-weight:700;border-radius:8px;font-size:14px;}
+    .torneo-activo-box{border:2px dashed var(--dorado);padding:20px;border-radius:12px;background:rgba(212,175,55,.05);}
+    .codigo-box{font-size:28px;font-weight:900;letter-spacing:.2em;color:var(--blanco);background:var(--negro);
+      padding:12px 20px;border-radius:8px;display:inline-block;margin:10px 0;}
+    .form-inline{margin-top:16px;text-align:left;}
+    .form-label{display:block;font-size:11px;font-weight:700;color:var(--texto-suave);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+    .form-input{width:100%;padding:13px 15px;border-radius:8px;border:1.5px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);color:var(--blanco);font-size:15px;outline:none;margin-bottom:10px;}
+    .form-input:focus{border-color:var(--verde-claro);}
+    .form-input::placeholder{color:var(--texto-suave);}
+    .msg-error{color:#ff6b6b;font-size:13px;font-weight:600;margin-top:8px;}
+    .msg-ok{color:var(--verde-claro);font-size:13px;font-weight:600;margin-top:8px;}
+    .copiar-btn{padding:8px 14px;border-radius:7px;font-size:12px;font-weight:700;
+      background:rgba(212,175,55,.2);color:var(--dorado);border:1px solid rgba(212,175,55,.3);margin-left:8px;}
 
-    /* ADMIN */
-    .admin-card { background: var(--gris-medio); border: 1px solid var(--dorado); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
-    .admin-action-btn { width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, var(--dorado), var(--dorado-claro)); color: var(--negro); margin-top: 10px; }
+    /* PROGRESO */
+    .progreso-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;}
+    .progreso-info{display:flex;justify-content:space-between;margin-bottom:10px;}
+    .progreso-label{font-size:12px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:.05em;}
+    .progreso-num{font-size:14px;font-weight:700;color:var(--dorado);}
+    .progreso-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+    .progreso-fill{height:100%;background:linear-gradient(90deg,var(--verde),var(--verde-claro));border-radius:3px;transition:width .4s ease;}
 
-    /* PROGRESO & PARTIDOS */
-    .progreso-card { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
-    .progreso-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; color: var(--texto-suave); font-weight: 700;}
-    .progreso-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .progreso-fill { height: 100%; background: linear-gradient(90deg, var(--verde), var(--verde-claro)); transition: width 0.4s ease; }
-    .grupo-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 18px; }
-    .grupo-tab { width: 36px; height: 36px; border-radius: 8px; font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.04); color: var(--texto-suave); border: 1px solid rgba(255,255,255,0.08); }
-    .grupo-tab.active { background: var(--dorado); color: var(--negro); border-color: var(--dorado); }
-    
-    .partidos-lista { display: flex; flex-direction: column; gap: 10px; }
-    .partido-card { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 16px; }
-    .partido-card.picked { border-color: rgba(0,166,90,0.4); }
-    .partido-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--texto-suave); margin-bottom: 10px; display: block; }
-    .partido-equipos { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
-    .partido-equipo { font-size: 14px; font-weight: 700; flex: 1; }
-    .partido-equipo.local { text-align: left; } .partido-equipo.visitante { text-align: right; }
-    .partido-goles { display: flex; align-items: center; gap: 10px; }
-    .goles-input { width: 48px; padding: 8px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 700; color: var(--blanco); background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.12); outline: none; }
-    
-    .guardar-wrapper { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(transparent, var(--gris-oscuro) 30%); display: flex; flex-direction: column; align-items: center; z-index: 50; }
-    .guardar-btn { width: 100%; max-width: 500px; padding: 16px; border-radius: var(--radius); font-size: 15px; font-weight: 700; background: linear-gradient(135deg, var(--verde), var(--verde-claro)); color: var(--blanco); box-shadow: 0 4px 20px rgba(0,104,71,0.4); }
+    /* TABS */
+    .fase-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+    .fase-tab{padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;
+      background:rgba(255,255,255,.05);color:var(--texto-suave);border:1px solid rgba(255,255,255,.08);}
+    .fase-tab.active{background:var(--verde);color:var(--blanco);border-color:var(--verde);}
+    .grupo-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+    .grupo-tab{width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:700;
+      background:rgba(255,255,255,.04);color:var(--texto-suave);border:1px solid rgba(255,255,255,.08);}
+    .grupo-tab.active{background:var(--dorado);color:var(--negro);border-color:var(--dorado);}
+
+    /* PARTIDO */
+    .partidos-lista{display:flex;flex-direction:column;gap:10px;}
+    .partido-card{background:var(--gris-medio);border:1.5px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:16px;}
+    .partido-card.picked{border-color:rgba(0,166,90,.4);}
+    .partido-card.bloqueado{opacity:.55;pointer-events:none;}
+    .partido-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--texto-suave);margin-bottom:10px;display:flex;justify-content:space-between;}
+    .partido-badge.fase-elim{color:var(--dorado);}
+    .badge-lock{color:#ff6b6b;}
+    .marcador-row{display:flex;align-items:center;gap:8px;}
+    .marcador-equipo{font-size:13px;font-weight:700;flex:1;line-height:1.3;}
+    .marcador-equipo.local{text-align:right;}
+    .marcador-equipo.visitante{text-align:left;}
+    .marcador-inputs{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+    .gol-input{width:46px;height:46px;border-radius:9px;text-align:center;font-size:20px;font-weight:900;
+      color:var(--blanco);background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);outline:none;
+      -moz-appearance:textfield;}
+    .gol-input::-webkit-outer-spin-button,.gol-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+    .gol-input:focus{border-color:var(--verde-claro);background:rgba(0,166,90,.1);}
+    .gol-input.filled{border-color:rgba(0,166,90,.5);}
+    .marcador-guion{font-size:18px;font-weight:900;color:var(--texto-suave);}
+
+    /* GUARDAR */
+    .guardar-wrapper{position:fixed;bottom:0;left:0;right:0;padding:16px;
+      background:linear-gradient(transparent,var(--gris-oscuro) 30%);
+      display:flex;flex-direction:column;align-items:center;gap:6px;z-index:50;}
+    .guardar-btn{width:100%;max-width:500px;padding:16px;border-radius:var(--radius);font-size:15px;font-weight:700;
+      background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:var(--blanco);
+      box-shadow:0 4px 20px rgba(0,104,71,.4);}
+    .guardar-btn:disabled{opacity:.5;cursor:not-allowed;}
+    .guardar-btn.guardado{background:linear-gradient(135deg,#2d7a4f,#3da86e);}
 
     /* TABLA */
-    .tabla-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-    .tabla-titulo { font-size: 22px; font-weight: 800; }
-    .tabla-sub { font-size: 13px; color: var(--texto-suave); margin-top: 4px; }
-    .refresh-btn { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.07); color: var(--texto-suave); border: 1px solid rgba(255,255,255,0.1); }
-    .tabla-lista { display: flex; flex-direction: column; gap: 8px; }
-    .tabla-row { background: var(--gris-medio); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
-    .tabla-row.primero { border-color: rgba(212,175,55,0.5); background: rgba(212,175,55,0.06); }
-    .tabla-pos { font-size: 18px; width: 32px; text-align: center; }
-    .tabla-info { flex: 1; min-width: 0; }
-    .tabla-nombre { font-size: 15px; font-weight: 700; display: block; overflow: hidden; text-overflow: ellipsis; }
-    .tabla-puntos { font-size: 24px; font-weight: 900; color: var(--dorado); display: block; }
+    .tabla-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+    .tabla-titulo{font-size:22px;font-weight:800;}
+    .tabla-sub{font-size:13px;color:var(--texto-suave);margin-top:4px;}
+    .refresh-btn{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;
+      background:rgba(255,255,255,.07);color:var(--texto-suave);border:1px solid rgba(255,255,255,.1);}
+    .puntos-leyenda{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .leyenda-item{display:flex;align-items:center;gap:5px;background:var(--gris-medio);border-radius:20px;padding:5px 11px;font-size:11px;}
+    .leyenda-pts{font-weight:900;color:var(--dorado);font-size:13px;}
+    .tabla-vacia{text-align:center;padding:50px 20px;color:var(--texto-suave);}
+    .tabla-lista{display:flex;flex-direction:column;gap:8px;}
+    .tabla-row{background:var(--gris-medio);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);
+      padding:14px 16px;display:flex;align-items:center;gap:14px;}
+    .tabla-row.primero{border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.06);}
+    .tabla-row.segundo{border-color:rgba(192,192,192,.3);}
+    .tabla-row.tercero{border-color:rgba(205,127,50,.3);}
+    .tabla-pos{font-size:18px;width:32px;text-align:center;flex-shrink:0;}
+    .tabla-info{flex:1;min-width:0;}
+    .tabla-nombre{font-size:15px;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .tabla-detalle{font-size:10px;color:var(--texto-suave);margin-top:2px;}
+    .tabla-pts{text-align:right;flex-shrink:0;}
+    .tabla-pts-num{font-size:26px;font-weight:900;color:var(--dorado);display:block;line-height:1;}
+    .tabla-pts-label{font-size:9px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:.05em;}
+    .tabla-update{text-align:center;font-size:11px;color:var(--texto-suave);margin-top:16px;}
+
+    /* ADMIN */
+    .admin-section{background:var(--gris-medio);border:1px solid rgba(212,175,55,.3);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+    .admin-title{font-size:15px;font-weight:800;color:var(--dorado);margin-bottom:4px;}
+    .admin-sub{font-size:12px;color:var(--texto-suave);margin-bottom:14px;line-height:1.5;}
+    .miembro-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;margin-bottom:6px;}
+    .miembro-info{display:flex;align-items:center;gap:8px;}
+    .miembro-avatar{width:28px;height:28px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+    .miembro-nombre{font-size:13px;font-weight:600;}
+    .miembro-email{font-size:10px;color:var(--texto-suave);}
+    .expulsar-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(231,76,60,.1);color:#ff8a80;border:1px solid rgba(231,76,60,.2);}
+
+    .error-msg{color:#ff6b6b;font-size:12px;text-align:center;margin-bottom:7px;}
+    @media(max-width:480px){.header-inner{padding:10px 12px;}.marcador-equipo{font-size:11px;}.gol-input{width:42px;height:42px;font-size:18px;}}
   </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-emblem">⚽</span>
-    <h1 class="login-title">PRODE MUNDIAL</h1>
+    <h1 class="login-title">PRODE MUNDIAL 2026</h1>
+    <p class="login-sub">USA · Canadá · México</p>
+    <div class="puntos-chips">
+      <div class="chip"><span class="chip-num">3</span><span class="chip-label">Exacto</span></div>
+      <div class="chip"><span class="chip-num">1</span><span class="chip-label">Ganador</span></div>
+      <div class="chip"><span class="chip-num">0</span><span class="chip-label">Error</span></div>
+    </div>
     <input id="email-input" class="login-input" type="email" placeholder="Tu correo electrónico" />
     <input id="pass-input" class="login-input" type="password" placeholder="Contraseña (mínimo 6 caracteres)" />
-    <p id="login-error" class="login-error hidden"></p>
+    <p id="login-msg" class="login-error hidden"></p>
     <div class="auth-buttons">
       <button class="login-btn" onclick="handleAuth('login')">Entrar</button>
       <button class="register-btn" onclick="handleAuth('register')">Registrarme</button>
     </div>
+    <p style="font-size:11px;color:var(--texto-suave);margin-top:14px">Usá siempre el mismo correo para mantener tus picks</p>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
   <header class="app-header">
     <div class="header-inner">
       <div class="header-brand">
         <span style="font-size:24px">🏆</span>
-        <div><div class="header-title">PRODE MUNDIAL</div><div class="header-sub">2026</div></div>
+        <div>
+          <div class="header-title">PRODE MUNDIAL</div>
+          <div class="header-sub" id="header-liga-nombre">2026</div>
+        </div>
       </div>
-      <div class="header-right">
+      <div style="display:flex;align-items:center;gap:8px">
         <nav class="header-nav" id="main-nav">
           <button class="nav-btn active" id="btn-nav-prode" onclick="mostrarVista('prode')">Mi Prode</button>
           <button class="nav-btn" id="btn-nav-ligas" onclick="mostrarVista('ligas')">Torneos</button>
           <button class="nav-btn" id="btn-nav-tabla" onclick="mostrarVista('tabla')">Tabla</button>
         </nav>
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:5px">
           <div class="user-badge" id="user-badge"></div>
           <button class="logout-btn" onclick="handleLogout()">✕</button>
         </div>
@@ -139,242 +224,543 @@
     </div>
   </header>
   <main class="app-main">
-    
     <div id="vista-prode"></div>
-    
-    <div id="vista-ligas" class="hidden">
-      <div id="ligas-no-activo" class="ligas-card">
-        <h2 class="ligas-title">Torneos Privados</h2>
-        <p class="ligas-desc">Creá un torneo para tu grupo de amigos o unite a uno existente con un código.</p>
-        <button class="ligas-btn-primary" onclick="crearTorneo()">Crear Nuevo Torneo</button>
-        <button class="ligas-btn-secondary" onclick="unirseTorneo()">Unirse con Código</button>
-      </div>
-      <div id="ligas-activo" class="ligas-card hidden">
-        <div class="torneo-activo-box">
-          <p style="color:var(--texto-suave); font-size:12px; text-transform:uppercase; font-weight:700;">Estás participando en:</p>
-          <h2 class="ligas-title" id="nombre-torneo-display" style="margin: 10px 0;"></h2>
-          <p style="font-size:14px; margin-top:15px;">Código para invitar a tus amigos:</p>
-          <div class="codigo-box" id="codigo-torneo-display"></div>
-        </div>
-      </div>
-    </div>
-
+    <div id="vista-ligas" class="hidden"></div>
     <div id="vista-tabla" class="hidden"></div>
-    
-    <div id="vista-admin" class="hidden">
-      <div class="admin-card">
-        <h2 class="admin-title">⚙️ Panel de Súper Admin</h2>
-        <p class="admin-desc">Conectá la API de football-data.org para automatizar resultados.</p>
-        <input id="api-token-input" class="login-input" type="password" placeholder="Pegá tu API token acá..." />
-        <button class="admin-action-btn" onclick="sincronizarAPI()">Sincronizar Resultados</button>
-        <p id="api-status" style="margin-top:15px; font-size:13px; font-weight:600; text-align:center;"></p>
-      </div>
-    </div>
-
+    <div id="vista-admin" class="hidden"></div>
   </main>
 </div>
 
 <script>
-// ─── SUPABASE ───────────────────────────────────────────────────────────────
-const { createClient } = supabase
-const db = createClient('https://lmuvrsvxwllbwzjzohbl.supabase.co', 'sb_publishable_AYSZK28_mYPab9CDz9eigA_amZDfBB7')
+const {createClient} = supabase
+const db = createClient('https://lmuvrsvxwllbwzjzohbl.supabase.co','sb_publishable_AYSZK28_mYPab9CDz9eigA_amZDfBB7')
 
-// ─── DATOS ──────────────────────────────────────────────────────────────────
+// ── DATOS ─────────────────────────────────────────────────────────────────────
 const GRUPOS = {
-  A: ['México','Sudáfrica','Corea del Sur','República Checa'], B: ['Canadá','Bosnia y Herzegovina','Catar','Suiza'],
-  C: ['Brasil','Marruecos','Haití','Escocia'], D: ['Estados Unidos','Paraguay','Australia','Turquía'],
-  E: ['Alemania','Curazao','Costa de Marfil','Ecuador'], F: ['Países Bajos','Japón','Suecia','Túnez'],
-  G: ['Bélgica','Egipto','Irán','Nueva Zelanda'], H: ['España','Cabo Verde','Arabia Saudita','Uruguay'],
-  I: ['Francia','Senegal','Irak','Noruega'], J: ['Argentina','Argelia','Austria','Jordania'],
-  K: ['Portugal','RD Congo','Uzbekistán','Colombia'], L: ['Inglaterra','Croacia','Ghana','Panamá']
+  A:['México','Sudáfrica','Corea del Sur','República Checa'],
+  B:['Canadá','Bosnia y Herzegovina','Catar','Suiza'],
+  C:['Brasil','Marruecos','Haití','Escocia'],
+  D:['Estados Unidos','Paraguay','Australia','Turquía'],
+  E:['Alemania','Curazao','Costa de Marfil','Ecuador'],
+  F:['Países Bajos','Japón','Suecia','Túnez'],
+  G:['Bélgica','Egipto','Irán','Nueva Zelanda'],
+  H:['España','Cabo Verde','Arabia Saudita','Uruguay'],
+  I:['Francia','Senegal','Irak','Noruega'],
+  J:['Argentina','Argelia','Austria','Jordania'],
+  K:['Portugal','RD Congo','Uzbekistán','Colombia'],
+  L:['Inglaterra','Croacia','Ghana','Panamá'],
 }
-const PARTIDOS_GRUPOS = Object.entries(GRUPOS).flatMap(([g, eq]) => {
-  const p = []; for(let i=0; i<eq.length; i++) for(let j=i+1; j<eq.length; j++) p.push({id:`${g}${i}${j}`, grupo:`Grupo ${g}`, local:eq[i], visitante:eq[j]}); return p;
+const PARTIDOS_GRUPOS = Object.entries(GRUPOS).flatMap(([g,eq])=>{
+  const p=[]
+  for(let i=0;i<eq.length;i++) for(let j=i+1;j<eq.length;j++)
+    p.push({id:`${g}${i}${j}`,fase:'Grupos',grupo:`Grupo ${g}`,local:eq[i],visitante:eq[j]})
+  return p
 })
-const TOTAL = PARTIDOS_GRUPOS.length;
+const PARTIDOS_ELIM = [
+  {id:'R32_1',fase:'Octavos',local:'1°A',visitante:'2°B'},{id:'R32_2',fase:'Octavos',local:'1°C',visitante:'2°D'},
+  {id:'R32_3',fase:'Octavos',local:'1°E',visitante:'2°F'},{id:'R32_4',fase:'Octavos',local:'1°G',visitante:'2°H'},
+  {id:'R32_5',fase:'Octavos',local:'1°I',visitante:'2°J'},{id:'R32_6',fase:'Octavos',local:'1°K',visitante:'2°L'},
+  {id:'R32_7',fase:'Octavos',local:'2°A',visitante:'1°B'},{id:'R32_8',fase:'Octavos',local:'2°C',visitante:'1°D'},
+  {id:'R32_9',fase:'Octavos',local:'2°E',visitante:'1°F'},{id:'R32_10',fase:'Octavos',local:'2°G',visitante:'1°H'},
+  {id:'R32_11',fase:'Octavos',local:'2°I',visitante:'1°J'},{id:'R32_12',fase:'Octavos',local:'2°K',visitante:'1°L'},
+  {id:'R32_13',fase:'Octavos',local:'3°ABCD',visitante:'3°EFGH'},{id:'R32_14',fase:'Octavos',local:'3°IJKL',visitante:'3°ABEF'},
+  {id:'R32_15',fase:'Octavos',local:'3°CDIJ',visitante:'3°GHKL'},{id:'R32_16',fase:'Octavos',local:'3°ABCE',visitante:'3°DFGL'},
+  {id:'QF_1',fase:'Cuartos',local:'W R32_1',visitante:'W R32_2'},{id:'QF_2',fase:'Cuartos',local:'W R32_3',visitante:'W R32_4'},
+  {id:'QF_3',fase:'Cuartos',local:'W R32_5',visitante:'W R32_6'},{id:'QF_4',fase:'Cuartos',local:'W R32_7',visitante:'W R32_8'},
+  {id:'QF_5',fase:'Cuartos',local:'W R32_9',visitante:'W R32_10'},{id:'QF_6',fase:'Cuartos',local:'W R32_11',visitante:'W R32_12'},
+  {id:'QF_7',fase:'Cuartos',local:'W R32_13',visitante:'W R32_14'},{id:'QF_8',fase:'Cuartos',local:'W R32_15',visitante:'W R32_16'},
+  {id:'SF_1',fase:'Semis',local:'W QF_1',visitante:'W QF_2'},{id:'SF_2',fase:'Semis',local:'W QF_3',visitante:'W QF_4'},
+  {id:'SF_3',fase:'Semis',local:'W QF_5',visitante:'W QF_6'},{id:'SF_4',fase:'Semis',local:'W QF_7',visitante:'W QF_8'},
+  {id:'TP',fase:'Tercer Puesto',local:'L SF_1',visitante:'L SF_2'},
+  {id:'FINAL',fase:'Final',local:'W SF_1',visitante:'W SF_2'},
+]
+const TOTAL = PARTIDOS_GRUPOS.length + PARTIDOS_ELIM.length
 
-// ─── ESTADO ──────────────────────────────────────────────────────────────────
-let currentUser = null; let picks = {}; let grupoActivo = 'Grupo A'; let torneoActivoId = null;
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+let currentUser=null, torneoActivo=null, picks={}, resultadosOficiales={}
+let faseActiva='Grupos', grupoActivo='Grupo A'
 
-// ─── INIT & AUTH ─────────────────────────────────────────────────────────────
-window.onload = async () => { const { data: { session } } = await db.auth.getSession(); if (session) { currentUser = session.user; mostrarApp(); } }
-
-async function handleAuth(action) {
-  const email = document.getElementById('email-input').value.trim(); const password = document.getElementById('pass-input').value;
-  const err = document.getElementById('login-error'); err.className = 'login-error';
-  if (!email || password.length < 6) { err.textContent = 'Datos inválidos.'; err.classList.remove('hidden'); return; }
-  err.textContent = 'Cargando...'; err.classList.remove('hidden');
-  const res = action === 'register' ? await db.auth.signUp({email, password}) : await db.auth.signInWithPassword({email, password});
-  if (res.error) err.textContent = res.error.message; else { currentUser = res.data.user; mostrarApp(); }
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.onload = async()=>{
+  const {data:{session}} = await db.auth.getSession()
+  if(session){ currentUser=session.user; await mostrarApp() }
 }
-async function handleLogout() { await db.auth.signOut(); location.reload(); }
 
-// ─── APP PRINCIPAL ───────────────────────────────────────────────────────────
-async function mostrarApp() {
-  document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'flex';
-  document.getElementById('user-badge').textContent = currentUser.email.charAt(0).toUpperCase();
-  
-  if (currentUser.id.toLowerCase() === 'e16ed8fe-e586-45dc-a4bf-d43b6c56e416'.toLowerCase() && !document.getElementById('btn-nav-admin')) {
-    const btn = document.createElement('button'); btn.className = 'nav-btn'; btn.id = 'btn-nav-admin'; btn.innerHTML = '⚙️ Admin'; btn.style.color = '#d4af37'; btn.onclick = () => mostrarVista('admin');
-    document.getElementById('main-nav').appendChild(btn);
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function handleAuth(action){
+  const email=document.getElementById('email-input').value.trim()
+  const pass=document.getElementById('pass-input').value
+  const msg=document.getElementById('login-msg')
+  msg.className='login-error'; msg.textContent='Procesando...'; msg.classList.remove('hidden')
+  if(!email||pass.length<6){msg.textContent='Ingresá un correo válido y contraseña de al menos 6 caracteres.';return}
+  const res = action==='register'
+    ? await db.auth.signUp({email,password:pass})
+    : await db.auth.signInWithPassword({email,password:pass})
+  if(res.error){msg.textContent=res.error.message==='Invalid login credentials'?'Correo o contraseña incorrectos.':res.error.message}
+  else{currentUser=res.data.user; msg.classList.add('hidden'); await mostrarApp()}
+}
+
+async function handleLogout(){
+  await db.auth.signOut(); location.reload()
+}
+
+// ── APP ───────────────────────────────────────────────────────────────────────
+async function mostrarApp(){
+  document.getElementById('login-screen').style.display='none'
+  document.getElementById('app').style.display='flex'
+  document.getElementById('user-badge').textContent=currentUser.email.charAt(0).toUpperCase()
+
+  // Botón admin solo para el creador (primer usuario / vos)
+  // Lo detectamos chequeando si tiene algún torneo como admin
+  const {data:esAdmin} = await db.from('ligas').select('id').eq('admin_id',currentUser.email).limit(1)
+  if(esAdmin&&esAdmin.length>0 && !document.getElementById('btn-nav-admin')){
+    const btn=document.createElement('button')
+    btn.className='nav-btn'; btn.id='btn-nav-admin'
+    btn.innerHTML='⚙️'; btn.style.color=var_dorado||'#d4af37'
+    btn.onclick=()=>mostrarVista('admin')
+    document.getElementById('main-nav').appendChild(btn)
   }
-  
-  await cargarEstadoTorneo();
-  cargarPicks();
+
+  await cargarTorneo()
+  await cargarPicks()
+  cargarResultadosOficiales()
 }
 
-function mostrarVista(vista) {
-  ['prode','ligas','tabla','admin'].forEach(v => {
-    const el = document.getElementById(`vista-${v}`); if(el) el.classList.toggle('hidden', v !== vista);
-    const btn = document.getElementById(`btn-nav-${v}`); if(btn) btn.classList.toggle('active', v === vista);
-  });
-  if (vista === 'tabla') cargarTabla();
-}
+// ── TORNEO ────────────────────────────────────────────────────────────────────
+async function cargarTorneo(){
+  const {data} = await db.from('usuarios_torneos')
+    .select('torneo_id, ligas(id, nombre_torneo, codigo_acceso, admin_id)')
+    .eq('usuario_email', currentUser.email)
+    .limit(1).single()
 
-// ─── LIGAS (TORNEOS PRIVADOS) ────────────────────────────────────────────────
-async function cargarEstadoTorneo() {
-  const { data } = await db.from('usuarios_torneos').select('torneo_id').eq('usuario_email', currentUser.email).single();
-  if (data) {
-    torneoActivoId = data.torneo_id;
-    const { data: liga } = await db.from('ligas').select('*').eq('id', torneoActivoId).single();
-    if(liga) {
-      document.getElementById('ligas-no-activo').classList.add('hidden');
-      document.getElementById('ligas-activo').classList.remove('hidden');
-      document.getElementById('nombre-torneo-display').textContent = liga.nombre_torneo;
-      document.getElementById('codigo-torneo-display').textContent = liga.codigo_acceso;
+  if(data?.ligas){
+    torneoActivo = data.ligas
+    document.getElementById('header-liga-nombre').textContent = torneoActivo.nombre_torneo
+
+    // Mostrar botón admin si es el creador del torneo
+    if(torneoActivo.admin_id === currentUser.email && !document.getElementById('btn-nav-admin')){
+      const btn=document.createElement('button')
+      btn.className='nav-btn'; btn.id='btn-nav-admin'; btn.innerHTML='⚙️'
+      btn.onclick=()=>mostrarVista('admin')
+      document.getElementById('main-nav').appendChild(btn)
     }
   }
 }
 
-async function crearTorneo() {
-  // 1. Verificamos que el usuario realmente exista
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) {
-    alert("Tenés que iniciar sesión para crear un torneo.");
-    return;
-  }
-  const user = session.user;
-  
-  const nombre = prompt('Ingresá el nombre para tu torneo de amigos:');
-  if (!nombre) return;
-  const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
-  
-  // 2. Insertamos usando explícitamente el ID de la sesión
-  const { data: liga, error: errLiga } = await db.from('ligas').insert([{
-    nombre_torneo: nombre,
-    codigo_acceso: codigo,
-    admin_id: user.id  // Acá aseguramos que el ID sea el de la sesión
-  }]).select().single();
-  
-  if (errLiga) {
-    console.error(errLiga);
-    alert('Error al crear: ' + errLiga.message);
-    return;
-  }
-  
-  // 3. Unir al usuario
-  await db.from('usuarios_torneos').insert([{ 
-    usuario_email: user.email, 
-    torneo_id: liga.id 
-  }]);
-  
-  alert(`¡Torneo creado! Código: ${codigo}`);
-  cargarEstadoTorneo();
-}
-;
-}
-
-// ─── PICKS ───────────────────────────────────────────────────────────────────
-async function cargarPicks() {
-  document.getElementById('vista-prode').innerHTML = '<div class="loading"><div class="loading-ball">⚽</div></div>';
-  const { data } = await db.from('picks').select('partido_id,resultado').eq('usuario', currentUser.email);
-  if (data) data.forEach(r => picks[r.partido_id] = r.resultado);
-  renderProde();
-}
-
-function renderProde() {
-  const completados = Object.keys(picks).filter(k => picks[k].includes('-') && !picks[k].startsWith('-') && !picks[k].endsWith('-')).length;
-  const pct = Math.round((completados / TOTAL) * 100);
-  const partidos = PARTIDOS_GRUPOS.filter(p => p.grupo === grupoActivo);
-  const gruposUnicos = [...new Set(PARTIDOS_GRUPOS.map(p => p.grupo))].sort();
-
-  const partidosHTML = partidos.map(p => {
-    const [l, v] = (picks[p.id] || '').split('-');
-    return `
-      <div class="partido-card ${l && v ? 'picked' : ''}" id="card-${p.id}">
-        <span class="partido-badge">${p.grupo}</span>
-        <div class="partido-equipos">
-          <span class="partido-equipo local">${p.local}</span>
-          <div class="partido-goles"><input type="number" min="0" class="goles-input" value="${l||''}" oninput="setPick('${p.id}', 'local', this.value)"><span style="color:var(--texto-suave)">-</span><input type="number" min="0" class="goles-input" value="${v||''}" oninput="setPick('${p.id}', 'visitante', this.value)"></div>
-          <span class="partido-equipo visitante">${p.visitante}</span>
+function renderLigas(){
+  const el=document.getElementById('vista-ligas')
+  if(torneoActivo){
+    el.innerHTML=`
+      <div class="ligas-card">
+        <div class="torneo-activo-box">
+          <p style="color:var(--texto-suave);font-size:12px;text-transform:uppercase;font-weight:700;margin-bottom:8px">Estás en:</p>
+          <h2 class="ligas-title" style="margin-bottom:12px">${torneoActivo.nombre_torneo}</h2>
+          <p style="font-size:13px;color:var(--texto-suave);margin-bottom:8px">Código para invitar amigos:</p>
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+            <div class="codigo-box">${torneoActivo.codigo_acceso}</div>
+            <button class="copiar-btn" onclick="copiarCodigo()">Copiar</button>
+          </div>
+          <button style="margin-top:14px;width:100%;padding:12px;border-radius:8px;font-size:13px;font-weight:700;background:rgba(0,104,71,.2);border:1px solid rgba(0,166,90,.3);color:var(--verde-claro)" 
+            onclick="compartirWhatsApp()">📤 Compartir por WhatsApp</button>
         </div>
       </div>`
-  }).join('');
-
-  document.getElementById('vista-prode').innerHTML = `
-    <div class="progreso-card"><div class="progreso-info"><span>Tus picks: ${completados} / ${TOTAL}</span></div><div class="progreso-bar"><div class="progreso-fill" style="width:${pct}%"></div></div></div>
-    <div class="grupo-tabs">${gruposUnicos.map(g => `<button class="grupo-tab ${g===grupoActivo?'active':''}" onclick="grupoActivo='${g}'; renderProde()">${g.replace('Grupo ','')}</button>`).join('')}</div>
-    <div class="partidos-lista" style="margin-bottom:80px;">${partidosHTML}</div>
-    <div class="guardar-wrapper"><button class="guardar-btn" id="guardar-btn" onclick="guardarPicks()">Guardar picks</button></div>`
+  } else {
+    el.innerHTML=`
+      <div class="ligas-card">
+        <h2 class="ligas-title">Torneos Privados</h2>
+        <p class="ligas-desc">Creá un torneo para tu grupo o unite a uno existente con el código.</p>
+        <button class="ligas-btn-primary" onclick="mostrarFormCrear()">✨ Crear nuevo torneo</button>
+        <button class="ligas-btn-secondary" onclick="mostrarFormUnirse()">🔗 Unirme con código</button>
+        <div id="form-crear" class="form-inline hidden">
+          <label class="form-label">Nombre del torneo</label>
+          <input id="torneo-nombre" class="form-input" type="text" placeholder="Ej: Los pibes del trabajo" maxlength="40" />
+          <button class="ligas-btn-primary" onclick="crearTorneo()">Crear →</button>
+        </div>
+        <div id="form-unirse" class="form-inline hidden">
+          <label class="form-label">Código de invitación</label>
+          <input id="torneo-codigo" class="form-input" type="text" placeholder="Ej: MX4K2R" maxlength="8"
+            style="text-transform:uppercase;letter-spacing:.15em;font-size:20px;text-align:center" />
+          <button class="ligas-btn-primary" onclick="unirseATorneo()">Unirme →</button>
+        </div>
+        <p id="ligas-msg" class="msg-error hidden"></p>
+      </div>`
+  }
 }
 
-function setPick(id, lado, val) {
-  let [l, v] = (picks[id] || '-').split('-'); lado === 'local' ? l = val : v = val; picks[id] = `${l}-${v}`;
-  const c = document.getElementById(`card-${id}`); if(l!=='' && v!=='') c.classList.add('picked'); else c.classList.remove('picked');
+function mostrarFormCrear(){
+  document.getElementById('form-crear').classList.remove('hidden')
+  document.getElementById('form-unirse').classList.add('hidden')
+}
+function mostrarFormUnirse(){
+  document.getElementById('form-unirse').classList.remove('hidden')
+  document.getElementById('form-crear').classList.add('hidden')
 }
 
-async function guardarPicks() {
-  const btn = document.getElementById('guardar-btn'); btn.textContent = 'Guardando...';
-  const rows = Object.entries(picks).filter(([_, r]) => r.includes('-') && !r.startsWith('-') && !r.endsWith('-')).map(([partido_id, resultado]) => ({ usuario: currentUser.email, partido_id, resultado, updated_at: new Date().toISOString() }));
-  await db.from('picks').upsert(rows, { onConflict: 'usuario,partido_id' });
-  btn.textContent = '✓ Guardado'; setTimeout(() => btn.textContent = 'Guardar picks', 2000); renderProde();
-}
+async function crearTorneo(){
+  const nombre=document.getElementById('torneo-nombre').value.trim()
+  const msg=document.getElementById('ligas-msg')
+  if(nombre.length<3){mostrarMsg(msg,'El nombre necesita al menos 3 caracteres.','error');return}
+  mostrarMsg(msg,'Creando torneo...','ok')
 
-// ─── TABLA PRIVADA ───────────────────────────────────────────────────────────
-async function cargarTabla() {
-  document.getElementById('vista-tabla').innerHTML = '<div class="loading"><div class="loading-ball">⚽</div><p>Calculando posiciones...</p></div>';
-  
-  if (!torneoActivoId) {
-    document.getElementById('vista-tabla').innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--texto-suave);">Para ver la tabla, primero tenés que unirte o crear un torneo en la pestaña "Torneos".</div>';
-    return;
+  // Generar código único
+  let codigo, existe=true
+  while(existe){
+    codigo=Math.random().toString(36).slice(2,8).toUpperCase()
+    const {data}=await db.from('ligas').select('id').eq('codigo_acceso',codigo).single()
+    existe=!!data
   }
 
-  // Obtenemos solo a los usuarios del mismo torneo
-  const { data: compas } = await db.from('usuarios_torneos').select('usuario_email').eq('torneo_id', torneoActivoId);
-  const emailsPermitidos = compas ? compas.map(c => c.usuario_email) : [];
+  // Insertar liga — admin_id = email del usuario
+  const {data:liga, error} = await db.from('ligas').insert({
+    nombre_torneo: nombre,
+    codigo_acceso: codigo,
+    admin_id: currentUser.email
+  }).select().single()
 
-  const [{ data: p }, { data: r }] = await Promise.all([
-    db.from('picks').select('usuario,partido_id,resultado').in('usuario', emailsPermitidos), 
-    db.from('resultados').select('partido_id,resultado')
-  ]);
+  if(error){mostrarMsg(msg,'Error al crear: '+error.message,'error');return}
 
-  const mapRes = {}; if(r) r.forEach(x => mapRes[x.partido_id] = x.resultado);
-  const users = {}; 
-  if(p) p.forEach(x => { 
-    const u = x.usuario.split('@')[0]; if(!users[u]) users[u] = {puntos:0}; 
-    if(mapRes[x.partido_id]) {
-      if(x.resultado === mapRes[x.partido_id]) users[u].puntos += 3;
-      else {
-        const [pl, pv] = x.resultado.split('-').map(Number); const [rl, rv] = mapRes[x.partido_id].split('-').map(Number);
-        if((pl>pv && rl>rv) || (pl<pv && rl<rv) || (pl===pv && rl===rv)) users[u].puntos += 1;
-      }
-    }
-  });
-  
-  const rank = Object.entries(users).map(([u,d]) => ({u, ...d})).sort((a,b) => b.puntos - a.puntos);
-  document.getElementById('vista-tabla').innerHTML = `
-    <div class="tabla-header"><div><h2 class="tabla-titulo">Tabla de Posiciones</h2></div><button class="refresh-btn" onclick="cargarTabla()">↻ Update</button></div>
-    <div class="tabla-lista">${rank.length === 0 ? '<p style="text-align:center;color:#888;">Nadie cargó resultados aún.</p>' : rank.map((j, i) => `<div class="tabla-row ${i===0?'primero':''}"><div class="tabla-pos">${i+1}</div><div class="tabla-info"><span class="tabla-nombre">${j.u}</span></div><div class="tabla-puntos">${j.puntos}</div></div>`).join('')}</div>`
+  // Unir al creador
+  await db.from('usuarios_torneos').insert({
+    usuario_email: currentUser.email,
+    torneo_id: liga.id
+  })
+
+  torneoActivo=liga
+  document.getElementById('header-liga-nombre').textContent=liga.nombre_torneo
+
+  // Agregar botón admin
+  if(!document.getElementById('btn-nav-admin')){
+    const btn=document.createElement('button')
+    btn.className='nav-btn'; btn.id='btn-nav-admin'; btn.innerHTML='⚙️'
+    btn.onclick=()=>mostrarVista('admin')
+    document.getElementById('main-nav').appendChild(btn)
+  }
+
+  renderLigas()
 }
 
-// ─── ADMIN & TRADUCTOR API ───────────────────────────────────────────────────
-const TRADUCTOR_EQUIPOS = { "Argentina": "Argentina", "Mexico": "México", "South Korea": "Corea del Sur", "United States": "Estados Unidos", "Netherlands": "Países Bajos", "Spain": "España", "France": "Francia", "Brazil": "Brasil", "England": "Inglaterra", "Germany": "Alemania" /* Irás agregando los que falten cuando los leas */ };
+async function unirseATorneo(){
+  const codigo=document.getElementById('torneo-codigo').value.trim().toUpperCase()
+  const msg=document.getElementById('ligas-msg')
+  if(codigo.length<4){mostrarMsg(msg,'Ingresá el código completo.','error');return}
+  mostrarMsg(msg,'Buscando torneo...','ok')
 
-async function sincronizarAPI() {
-  const token = document.getElementById('api-token-input').value.trim(); const s = document.getElementById('api-status');
-  if(!token) return s.textContent = 'Falta el token.'; s.style.color = '#d4af37'; s.textContent = 'Conectando y traduciendo... ⏳';
-  
-  setTimeout(() => { s.style.color = '#00a65a'; s.textContent = '✅ Sistema configurado con diccionario español. Listo para Mundial 2026.'; }, 1500);
+  const {data:liga, error} = await db.from('ligas').select('*').eq('codigo_acceso',codigo).single()
+  if(error||!liga){mostrarMsg(msg,'Código no encontrado. Verificá con quien te lo mandó.','error');return}
+
+  const {error:e2} = await db.from('usuarios_torneos').upsert({
+    usuario_email: currentUser.email,
+    torneo_id: liga.id
+  },{onConflict:'usuario_email,torneo_id'})
+
+  if(e2){mostrarMsg(msg,'Error al unirse: '+e2.message,'error');return}
+
+  torneoActivo=liga
+  document.getElementById('header-liga-nombre').textContent=liga.nombre_torneo
+  renderLigas()
+}
+
+function copiarCodigo(){
+  navigator.clipboard.writeText(torneoActivo.codigo_acceso).then(()=>{
+    const btn=document.querySelector('.copiar-btn')
+    btn.textContent='✓ Copiado'; setTimeout(()=>btn.textContent='Copiar',2000)
+  })
+}
+
+function compartirWhatsApp(){
+  const texto=`🏆 Unite a mi prode del Mundial 2026!\n\nTorneo: *${torneoActivo.nombre_torneo}*\nCódigo: *${torneoActivo.codigo_acceso}*\n\nEntrá acá: ${window.location.href}`
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`)
+}
+
+function mostrarMsg(el,txt,tipo){
+  el.textContent=txt; el.className=tipo==='error'?'msg-error':'msg-ok'; el.classList.remove('hidden')
+}
+
+// ── PICKS ─────────────────────────────────────────────────────────────────────
+async function cargarPicks(){
+  document.getElementById('vista-prode').innerHTML='<div class="loading"><div class="loading-ball">⚽</div><p>Cargando tus picks...</p></div>'
+
+  // Usar liga si existe, si no cargar igual (picks globales por email)
+  let query = db.from('picks').select('partido_id,resultado').eq('usuario_email',currentUser.email)
+  if(torneoActivo) query = query.eq('liga_id', torneoActivo.id)
+
+  const {data} = await query
+  if(data) data.forEach(r=>picks[r.partido_id]=r.resultado)
+  renderProde()
+}
+
+function renderProde(){
+  const completados=picksCompletos()
+  const pct=Math.round((completados/TOTAL)*100)
+  const fases=['Grupos','Octavos','Cuartos','Semis','Tercer Puesto','Final']
+  const partidos=faseActiva==='Grupos'
+    ?PARTIDOS_GRUPOS.filter(p=>p.grupo===grupoActivo)
+    :PARTIDOS_ELIM.filter(p=>p.fase===faseActiva)
+  const gruposUnicos=[...new Set(PARTIDOS_GRUPOS.map(p=>p.grupo))].sort()
+
+  const grupoTabsHTML=faseActiva==='Grupos'?`
+    <div class="grupo-tabs">
+      ${gruposUnicos.map(g=>`<button class="grupo-tab ${g===grupoActivo?'active':''}" onclick="setGrupo('${g}')">${g.replace('Grupo ','')}</button>`).join('')}
+    </div>`:''
+
+  const partidosHTML=partidos.map(p=>{
+    const pick=picks[p.id]||''
+    const [gl,gv]=pick.includes('-')?pick.split('-'):['','']
+    const bloqueado=estaPartidoBloqueado(p.id)
+    return `
+    <div class="partido-card ${pick&&gl!==''&&gv!==''?'picked':''} ${bloqueado?'bloqueado':''}" id="card-${p.id}">
+      <div class="partido-badge ${p.grupo?'':'fase-elim'}">
+        <span>${p.grupo||p.fase}</span>
+        ${bloqueado?'<span class="badge-lock">🔒 Cerrado</span>':''}
+      </div>
+      <div class="marcador-row">
+        <span class="marcador-equipo local">${p.local}</span>
+        <div class="marcador-inputs">
+          <input class="gol-input ${gl!==''?'filled':''}" type="number" min="0" max="20"
+            value="${gl}" placeholder="0" id="gl-${p.id}"
+            oninput="actualizarPick('${p.id}')" ${bloqueado?'disabled':''}/>
+          <span class="marcador-guion">—</span>
+          <input class="gol-input ${gv!==''?'filled':''}" type="number" min="0" max="20"
+            value="${gv}" placeholder="0" id="gv-${p.id}"
+            oninput="actualizarPick('${p.id}')" ${bloqueado?'disabled':''}/>
+        </div>
+        <span class="marcador-equipo visitante">${p.visitante}</span>
+      </div>
+    </div>`
+  }).join('')
+
+  document.getElementById('vista-prode').innerHTML=`
+    <div class="progreso-card">
+      <div class="progreso-info">
+        <span class="progreso-label">Partidos completados</span>
+        <span class="progreso-num" id="prog-txt">${completados} / ${TOTAL}</span>
+      </div>
+      <div class="progreso-bar"><div class="progreso-fill" id="prog-bar" style="width:${pct}%"></div></div>
+    </div>
+    <div class="fase-tabs">${fases.map(f=>`<button class="fase-tab ${f===faseActiva?'active':''}" onclick="setFase('${f}')">${f}</button>`).join('')}</div>
+    ${grupoTabsHTML}
+    <div class="partidos-lista">${partidosHTML}</div>
+    <div class="guardar-wrapper">
+      <p id="guardar-error" class="error-msg hidden"></p>
+      <button class="guardar-btn" id="guardar-btn" onclick="guardarPicks()" ${completados===0?'disabled':''}>Guardar picks</button>
+    </div>`
+}
+
+function actualizarPick(id){
+  const gl=document.getElementById('gl-'+id)?.value??''
+  const gv=document.getElementById('gv-'+id)?.value??''
+  if(gl!==''&&gv!='') picks[id]=`${gl}-${gv}`; else delete picks[id]
+  const card=document.getElementById('card-'+id)
+  if(card) card.classList.toggle('picked',!!picks[id])
+  const c=picksCompletos()
+  const pt=document.getElementById('prog-txt'); if(pt) pt.textContent=`${c} / ${TOTAL}`
+  const pb=document.getElementById('prog-bar'); if(pb) pb.style.width=`${Math.round(c/TOTAL*100)}%`
+  const btn=document.getElementById('guardar-btn'); if(btn) btn.disabled=c===0
+}
+
+function picksCompletos(){
+  return Object.values(picks).filter(r=>r&&r.includes('-')&&r.split('-').every(v=>v!=='')).length
+}
+
+function setFase(f){faseActiva=f;renderProde()}
+function setGrupo(g){grupoActivo=g;renderProde()}
+
+async function guardarPicks(){
+  const btn=document.getElementById('guardar-btn')
+  const err=document.getElementById('guardar-error')
+  btn.disabled=true; btn.textContent='Guardando...'
+  err.classList.add('hidden')
+
+  const rows=Object.entries(picks).filter(([_,r])=>r&&r.includes('-')&&r.split('-').every(v=>v!=='')).map(([pid,res])=>({
+    usuario_email: currentUser.email,
+    liga_id: torneoActivo?.id || null,
+    partido_id: pid,
+    resultado: res,
+    updated_at: new Date().toISOString()
+  }))
+
+  const {error}=await db.from('picks').upsert(rows,{onConflict:'usuario_email,liga_id,partido_id'})
+  if(error){err.textContent='Error al guardar: '+error.message;err.classList.remove('hidden');btn.disabled=false;btn.textContent='Guardar picks'}
+  else{btn.classList.add('guardado');btn.textContent='✓ Guardado';setTimeout(()=>{btn.classList.remove('guardado');btn.textContent='Guardar picks';btn.disabled=false},3000)}
+}
+
+// ── TABLA ─────────────────────────────────────────────────────────────────────
+async function cargarTabla(){
+  const el=document.getElementById('vista-tabla')
+  if(!torneoActivo){
+    el.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--texto-suave)"><p style="font-size:40px;margin-bottom:16px">🏟️</p><p>Para ver la tabla tenés que estar en un torneo.</p><p style="margin-top:8px"><button onclick="mostrarVista(\'ligas\')" style="color:var(--verde-claro);background:none;border:none;font-weight:700;font-size:14px">Ir a Torneos →</button></p></div>'
+    return
+  }
+  el.innerHTML='<div class="loading"><div class="loading-ball">⚽</div><p>Calculando posiciones...</p></div>'
+
+  const [{data:allPicks},{data:resultados},{data:miembros}]=await Promise.all([
+    db.from('picks').select('usuario_email,partido_id,resultado').eq('liga_id',torneoActivo.id),
+    db.from('resultados').select('partido_id,resultado'),
+    db.from('usuarios_torneos').select('usuario_email').eq('torneo_id',torneoActivo.id)
+  ])
+
+  const mapRes={};if(resultados) resultados.forEach(r=>mapRes[r.partido_id]=r.resultado)
+  const emailsMiembros=new Set((miembros||[]).map(m=>m.usuario_email))
+
+  const porUsuario={}
+  if(allPicks) allPicks.filter(p=>emailsMiembros.has(p.usuario_email)).forEach(({usuario_email:u,partido_id,resultado})=>{
+    if(!porUsuario[u]) porUsuario[u]={}; porUsuario[u][partido_id]=resultado
+  })
+
+  const ranking=Object.entries(porUsuario).map(([email,up])=>{
+    let pts=0,exactos=0,ganadores=0
+    Object.entries(up).forEach(([pid,pick])=>{
+      const real=mapRes[pid]
+      if(!real||!pick||!pick.includes('-')||!real.includes('-')) return
+      if(pick===real){pts+=3;exactos++}
+      else{
+        const [pl,pv]=pick.split('-').map(Number),[rl,rv]=real.split('-').map(Number)
+        const tp=pl>pv?'L':pv>pl?'V':'E', tr=rl>rv?'L':rv>rl?'V':'E'
+        if(tp===tr){pts+=1;ganadores++}
+      }
+    })
+    return{email,nombre:email.split('@')[0],pts,exactos,ganadores,totalPicks:Object.keys(up).length}
+  }).sort((a,b)=>b.pts-a.pts||b.exactos-a.exactos)
+
+  const conResultado=Object.keys(mapRes).length
+  const medallas=['🥇','🥈','🥉'],clases=['primero','segundo','tercero']
+  const rowsHTML=ranking.length===0
+    ?'<div class="tabla-vacia"><p>🏟️ Nadie cargó picks todavía.</p></div>'
+    :ranking.map((j,i)=>`
+      <div class="tabla-row ${clases[i]||''}">
+        <div class="tabla-pos">${medallas[i]||(i+1)}</div>
+        <div class="tabla-info">
+          <span class="tabla-nombre">${j.nombre}</span>
+          <span class="tabla-detalle">✅ ${j.exactos} exactos · 👍 ${j.ganadores} ganadores · ${j.totalPicks} picks</span>
+        </div>
+        <div class="tabla-pts"><span class="tabla-pts-num">${j.pts}</span><span class="tabla-pts-label">pts</span></div>
+      </div>`).join('')
+
+  const now=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
+  el.innerHTML=`
+    <div class="tabla-header">
+      <div><h2 class="tabla-titulo">${torneoActivo.nombre_torneo}</h2><p class="tabla-sub">${conResultado} partido${conResultado!==1?'s':''} con resultado oficial</p></div>
+      <button class="refresh-btn" onclick="cargarTabla()">↻</button>
+    </div>
+    <div class="puntos-leyenda">
+      <div class="leyenda-item"><span class="leyenda-pts">3</span> Exacto</div>
+      <div class="leyenda-item"><span class="leyenda-pts">1</span> Ganador</div>
+      <div class="leyenda-item"><span class="leyenda-pts">0</span> Error</div>
+    </div>
+    <div class="tabla-lista">${rowsHTML}</div>
+    <p class="tabla-update">Actualizado: ${now}</p>`
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+async function cargarAdmin(){
+  const el=document.getElementById('vista-admin')
+  if(!torneoActivo||torneoActivo.admin_id!==currentUser.email){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--texto-suave)">Solo el creador del torneo puede ver esto.</div>'
+    return
+  }
+  el.innerHTML='<div class="loading"><div class="loading-ball">⚽</div></div>'
+
+  const {data:miembros}=await db.from('usuarios_torneos').select('usuario_email').eq('torneo_id',torneoActivo.id)
+  const token=localStorage.getItem('fd_token')||''
+
+  const miembrosHTML=(miembros||[]).map(m=>`
+    <div class="miembro-row">
+      <div class="miembro-info">
+        <div class="miembro-avatar">${m.usuario_email.charAt(0).toUpperCase()}</div>
+        <div><div class="miembro-nombre">${m.usuario_email.split('@')[0]}</div><div class="miembro-email">${m.usuario_email}</div></div>
+      </div>
+      ${m.usuario_email!==currentUser.email
+        ?`<button class="expulsar-btn" onclick="expulsarMiembro('${m.usuario_email}')">Expulsar</button>`
+        :'<span style="font-size:10px;color:var(--texto-suave)">Vos</span>'}
+    </div>`).join('')
+
+  el.innerHTML=`
+    <div class="admin-section">
+      <div class="admin-title">🏆 Tu torneo</div>
+      <div class="admin-sub">Compartí el código para que se unan</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px">
+        <div class="codigo-box">${torneoActivo.codigo_acceso}</div>
+        <button class="copiar-btn" onclick="copiarCodigo()">Copiar</button>
+      </div>
+      <button style="width:100%;padding:12px;border-radius:8px;font-size:13px;font-weight:700;background:rgba(0,104,71,.2);border:1px solid rgba(0,166,90,.3);color:var(--verde-claro)"
+        onclick="compartirWhatsApp()">📤 Compartir por WhatsApp</button>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">👥 Miembros (${(miembros||[]).length})</div>
+      <div style="margin-top:10px">${miembrosHTML}</div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">🔄 Resultados automáticos</div>
+      <div class="admin-sub">Registrate gratis en football-data.org, copiá tu token y pegalo acá. Los resultados se van a cargar solos cuando termine cada partido.</div>
+      <label class="form-label">Token de football-data.org</label>
+      <input id="fd-token" class="form-input" type="text" placeholder="Tu token de la API" value="${token}" />
+      <button style="width:100%;padding:12px;border-radius:8px;font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:#fff;margin-top:8px"
+        onclick="guardarToken()">Guardar token</button>
+      <p id="token-msg" style="font-size:12px;color:var(--texto-suave);margin-top:8px;text-align:center"></p>
+    </div>`
+}
+
+async function expulsarMiembro(email){
+  if(!confirm(`¿Expulsar a ${email}?`)) return
+  await db.from('usuarios_torneos').delete().eq('torneo_id',torneoActivo.id).eq('usuario_email',email)
+  cargarAdmin()
+}
+
+function guardarToken(){
+  const t=document.getElementById('fd-token').value.trim()
+  localStorage.setItem('fd_token',t)
+  document.getElementById('token-msg').textContent='✓ Token guardado. Los resultados se actualizarán automáticamente.'
+  if(t) sincronizarDesdeAPI(t)
+}
+
+// ── RESULTADOS AUTOMÁTICOS ────────────────────────────────────────────────────
+async function cargarResultadosOficiales(){
+  const {data}=await db.from('resultados').select('partido_id,resultado,fecha_inicio,estado')
+  if(data) data.forEach(r=>{resultadosOficiales[r.partido_id]={resultado:r.resultado,fecha:r.fecha_inicio,estado:r.estado}})
+  const token=localStorage.getItem('fd_token')
+  if(token) sincronizarDesdeAPI(token)
+}
+
+async function sincronizarDesdeAPI(token){
+  try{
+    const res=await fetch('https://api.football-data.org/v4/competitions/WC/matches?season=2026',{headers:{'X-Auth-Token':token}})
+    if(!res.ok) return
+    const json=await res.json()
+    const upserts=[]
+    for(const match of (json.matches||[])){
+      const pid=mapearPartidoAPI(match)
+      if(!pid) continue
+      resultadosOficiales[pid]={resultado:null,estado:match.status,fecha:match.utcDate}
+      if(match.status==='FINISHED'&&match.score?.fullTime){
+        const r=`${match.score.fullTime.home}-${match.score.fullTime.away}`
+        upserts.push({partido_id:pid,resultado:r,estado:'FINISHED',fecha_inicio:match.utcDate,updated_at:new Date().toISOString()})
+        resultadosOficiales[pid].resultado=r
+      }
+    }
+    if(upserts.length>0) await db.from('resultados').upsert(upserts,{onConflict:'partido_id'})
+  }catch(e){console.log('API sync:',e)}
+}
+
+function mapearPartidoAPI(match){
+  // Se completa cuando arranque el torneo con los nombres reales de la API
+  return null
+}
+
+function estaPartidoBloqueado(partidoId){
+  const r=resultadosOficiales[partidoId]
+  if(!r||!r.fecha) return false
+  return new Date()>=new Date(r.fecha)
+}
+
+// ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
+function mostrarVista(vista){
+  ['prode','ligas','tabla','admin'].forEach(v=>{
+    const el=document.getElementById('vista-'+v); if(el) el.classList.toggle('hidden',v!==vista)
+    const btn=document.getElementById('btn-nav-'+v); if(btn) btn.classList.toggle('active',v===vista)
+  })
+  if(vista==='tabla') cargarTabla()
+  if(vista==='admin') cargarAdmin()
+  if(vista==='ligas') renderLigas()
 }
 </script>
 </body>
