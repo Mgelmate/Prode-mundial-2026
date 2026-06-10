@@ -57,24 +57,34 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; margin-bottom: 6px;
     }
-    .login-sub { color: var(--texto-suave); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 32px; }
-    .login-label { display: block; text-align: left; font-size: 12px; font-weight: 600; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .login-sub { color: var(--texto-suave); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 32px; }
+    
     .login-input {
       width: 100%; padding: 14px 16px; border-radius: 8px;
       border: 1.5px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.05); color: var(--blanco);
-      font-size: 16px; outline: none; margin-bottom: 12px;
+      font-size: 15px; outline: none; margin-bottom: 12px;
     }
     .login-input:focus { border-color: var(--verde-claro); }
     .login-input::placeholder { color: var(--texto-suave); }
+    
+    .auth-buttons { display: flex; gap: 10px; margin-top: 8px; }
     .login-btn {
-      width: 100%; padding: 15px;
+      flex: 1; padding: 14px;
       background: linear-gradient(135deg, var(--verde), var(--verde-claro));
       color: var(--blanco); border-radius: 8px;
-      font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.04em;
     }
-    .login-hint { margin-top: 16px; font-size: 12px; color: var(--texto-suave); line-height: 1.6; }
-    .login-error { color: #ff6b6b; font-size: 13px; margin-bottom: 8px; }
+    .register-btn {
+      flex: 1; padding: 14px;
+      background: transparent; border: 1.5px solid rgba(255,255,255,0.2);
+      color: var(--blanco); border-radius: 8px;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.04em; transition: all 0.2s;
+    }
+    .register-btn:hover { border-color: var(--verde-claro); }
+    
+    .login-error { color: #ff6b6b; font-size: 13px; margin-bottom: 12px; font-weight: 600; }
+    .login-success { color: var(--verde-claro); font-size: 13px; margin-bottom: 12px; font-weight: 600; }
 
     /* HEADER */
     #app { display: none; flex-direction: column; min-height: 100vh; }
@@ -105,7 +115,7 @@
     .user-badge {
       width: 28px; height: 28px; background: var(--dorado); color: var(--negro);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800;
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
     }
     .logout-btn { background: transparent; color: var(--texto-suave); font-size: 12px; padding: 4px 6px; }
 
@@ -212,7 +222,6 @@
     .tabla-puntos { font-size: 24px; font-weight: 900; color: var(--dorado); display: block; line-height: 1; }
     .tabla-puntos-label { font-size: 10px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.05em; }
     .tabla-update { text-align: center; font-size: 11px; color: var(--texto-suave); margin-top: 20px; }
-    .error-msg { color: #ff6b6b; font-size: 13px; text-align: center; margin-bottom: 8px; }
 
     @media (max-width: 480px) {
       .header-inner { padding: 10px 12px; }
@@ -222,19 +231,26 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-emblem">⚽</span>
     <h1 class="login-title">PRODE MUNDIAL 2026</h1>
-    <p class="login-sub">Easy Moreno · Elegí tus pronósticos</p>
-    <label class="login-label" for="nombre-input">¿Cómo te llamás?</label>
-    <input id="nombre-input" class="login-input" type="text" placeholder="Tu nombre o apodo" maxlength="30" />
+    <p class="login-sub">Torneo de amigos</p>
+    
+    <input id="email-input" class="login-input" type="email" placeholder="Tu correo electrónico" />
+    <input id="pass-input" class="login-input" type="password" placeholder="Contraseña (mínimo 6 letras/números)" />
+    
     <p id="login-error" class="login-error hidden"></p>
-    <button class="login-btn" onclick="handleLogin()">Entrar al prode →</button>
-    <p class="login-hint">Usá siempre el mismo nombre para que tus picks se guarden correctamente</p>
+    
+    <div class="auth-buttons">
+      <button class="login-btn" onclick="handleAuth('login')">Entrar</button>
+      <button class="register-btn" onclick="handleAuth('register')">Registrarme</button>
+    </div>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
   <header class="app-header">
     <div class="header-inner">
@@ -251,7 +267,7 @@
           <button class="nav-btn" id="btn-nav-tabla" onclick="mostrarVista('tabla')">Tabla</button>
         </nav>
         <div style="display:flex;align-items:center;gap:6px">
-          <div class="user-badge" id="user-badge"></div>
+          <div class="user-badge" id="user-badge" title="Mi Cuenta"></div>
           <button class="logout-btn" onclick="handleLogout()">✕</button>
         </div>
       </div>
@@ -317,44 +333,74 @@ const PARTIDOS_ELIM = [
 const TOTAL = PARTIDOS_GRUPOS.length + PARTIDOS_ELIM.length
 
 // ─── ESTADO ──────────────────────────────────────────────────────────────────
-let usuario = localStorage.getItem('prode_usuario') || null
-let picks = {} // Guardará formato "2-1" (Goles Local - Goles Visitante)
+let currentUser = null; // Guardará la sesión de Supabase
+let picks = {} // Guardará formato "2-1"
 let faseActiva = 'Grupos'
 let grupoActivo = 'Grupo A'
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-window.onload = () => {
-  if (usuario) mostrarApp()
+window.onload = async () => {
+  // Chequea si el usuario ya inició sesión antes
+  const { data: { session } } = await db.auth.getSession()
+  if (session) {
+    currentUser = session.user
+    mostrarApp()
+  }
 }
 
-document.getElementById('nombre-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin()
-})
-
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
-function handleLogin() {
-  const val = document.getElementById('nombre-input').value.trim()
+// ─── LOGIN Y REGISTRO ─────────────────────────────────────────────────────────
+async function handleAuth(action) {
+  const email = document.getElementById('email-input').value.trim()
+  const password = document.getElementById('pass-input').value
   const err = document.getElementById('login-error')
-  if (val.length < 2) { err.textContent = 'Ingresá tu nombre (mínimo 2 caracteres)'; err.classList.remove('hidden'); return }
-  localStorage.setItem('prode_usuario', val)
-  usuario = val
-  err.classList.add('hidden')
-  mostrarApp()
+  
+  err.className = 'login-error' // resetea clases
+  
+  if (!email || password.length < 6) { 
+    err.textContent = 'Ingresá un correo válido y una contraseña de al menos 6 caracteres.'; 
+    err.classList.remove('hidden'); 
+    return 
+  }
+
+  err.textContent = 'Procesando...';
+  err.classList.remove('hidden');
+
+  let result;
+  if (action === 'register') {
+    result = await db.auth.signUp({ email, password })
+  } else {
+    result = await db.auth.signInWithPassword({ email, password })
+  }
+
+  const { data, error } = result;
+
+  if (error) {
+    err.textContent = error.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : error.message
+  } else {
+    if (action === 'register') {
+      err.textContent = '¡Cuenta creada con éxito! Entrando...'
+      err.className = 'login-success'
+    }
+    currentUser = data.user
+    setTimeout(mostrarApp, 1000)
+  }
 }
 
-function handleLogout() {
-  localStorage.removeItem('prode_usuario')
-  usuario = null; picks = {}
+async function handleLogout() {
+  await db.auth.signOut()
+  currentUser = null; 
+  picks = {}
   document.getElementById('app').style.display = 'none'
   document.getElementById('login-screen').style.display = 'flex'
-  document.getElementById('nombre-input').value = ''
+  document.getElementById('pass-input').value = ''
 }
 
 function mostrarApp() {
   document.getElementById('login-screen').style.display = 'none'
   const app = document.getElementById('app')
   app.style.display = 'flex'
-  document.getElementById('user-badge').textContent = usuario.charAt(0).toUpperCase()
+  // Mostrar la primera letra del correo como avatar
+  document.getElementById('user-badge').textContent = currentUser.email.charAt(0)
   cargarPicks()
 }
 
@@ -370,7 +416,8 @@ function mostrarVista(vista) {
 // ─── PICKS ────────────────────────────────────────────────────────────────────
 async function cargarPicks() {
   document.getElementById('vista-prode').innerHTML = '<div class="loading"><div class="loading-ball">⚽</div><p>Cargando tus picks...</p></div>'
-  const { data, error } = await db.from('picks').select('partido_id,resultado').eq('usuario', usuario)
+  // Ahora filtramos por el correo del usuario en lugar del nombre tipeado
+  const { data, error } = await db.from('picks').select('partido_id,resultado').eq('usuario', currentUser.email)
   if (!error) data.forEach(r => picks[r.partido_id] = r.resultado)
   renderProde()
 }
@@ -445,7 +492,6 @@ function setPickGoles(partidoId, lado, valor) {
   
   picks[partidoId] = `${l}-${v}`;
 
-  // Actualizar UI visual sin recargar toda la lista
   const card = document.getElementById(`card-${partidoId}`);
   if (l !== '' && v !== '') {
     card.classList.add('picked');
@@ -490,8 +536,9 @@ async function guardarPicks() {
   err.classList.add('hidden')
 
   const validPicks = obtenerPicksCompletos();
+  // Ahora pasamos el email en lugar de la variable usuario vieja
   const rows = validPicks.map(([partido_id, resultado]) => ({
-    usuario, partido_id, resultado, updated_at: new Date().toISOString()
+    usuario: currentUser.email, partido_id, resultado, updated_at: new Date().toISOString()
   }))
 
   const { error } = await db.from('picks').upsert(rows, { onConflict: 'usuario,partido_id' })
@@ -526,33 +573,26 @@ async function cargarTabla() {
 
   const porUsuario = {}
   if (allPicks) allPicks.forEach(({ usuario: u, partido_id, resultado }) => {
-    if (!porUsuario[u]) porUsuario[u] = {}
-    porUsuario[u][partido_id] = resultado
+    // Para no mostrar el correo completo por privacidad en la tabla, mostramos el nombre antes del @
+    const apodo = u.split('@')[0]
+    if (!porUsuario[apodo]) porUsuario[apodo] = {}
+    porUsuario[apodo][partido_id] = resultado
   })
 
-  // CÁLCULO DE PUNTOS NUEVO
   const ranking = Object.entries(porUsuario).map(([u, userPicks]) => {
     let puntosTotales = 0;
     
     Object.entries(userPicks).forEach(([pid, resPick]) => {
       const resReal = mapRes[pid];
-      
-      // Chequeo básico para asegurar que ambos strings contengan el guión "-"
       if (resReal && resPick && resPick.includes('-') && resReal.includes('-')) {
-        
         if (resPick === resReal) {
-          // Acierto exacto: 3 puntos
           puntosTotales += 3;
         } else {
-          // Parseo para ver quién ganó o si fue empate
           const [pickL, pickV] = resPick.split('-').map(Number);
           const [realL, realV] = resReal.split('-').map(Number);
-          
           const tendPick = pickL > pickV ? 'L' : (pickL < pickV ? 'V' : 'E');
           const tendReal = realL > realV ? 'L' : (realL < realV ? 'V' : 'E');
-          
           if (tendPick === tendReal) {
-            // Acierto de tendencia (ganador/empate): 1 punto
             puntosTotales += 1;
           }
         }
