@@ -247,27 +247,41 @@ async function cargarEstadoTorneo() {
 }
 
 async function crearTorneo() {
-  const nombre = prompt('Ingresá el nombre para tu torneo de amigos:'); if(!nombre) return;
-  const codigo = Math.random().toString(36).substring(2,8).toUpperCase();
+  // 1. Verificamos que el usuario realmente exista
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    alert("Tenés que iniciar sesión para crear un torneo.");
+    return;
+  }
+  const user = session.user;
   
-  // 1. Crear en Ligas
-  const { data: liga, error: errLiga } = await db.from('ligas').insert([{ nombre_torneo: nombre, codigo_acceso: codigo, admin_id: currentUser.id }]).select().single();
-  if(errLiga) return alert('Error al crear el torneo. Intentá de nuevo.');
+  const nombre = prompt('Ingresá el nombre para tu torneo de amigos:');
+  if (!nombre) return;
+  const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
   
-  // 2. Unir al usuario
-  await db.from('usuarios_torneos').insert([{ usuario_email: currentUser.email, torneo_id: liga.id }]);
-  alert(`¡Torneo creado! El código para invitar amigos es: ${codigo}`);
+  // 2. Insertamos usando explícitamente el ID de la sesión
+  const { data: liga, error: errLiga } = await db.from('ligas').insert([{
+    nombre_torneo: nombre,
+    codigo_acceso: codigo,
+    admin_id: user.id  // Acá aseguramos que el ID sea el de la sesión
+  }]).select().single();
+  
+  if (errLiga) {
+    console.error(errLiga);
+    alert('Error al crear: ' + errLiga.message);
+    return;
+  }
+  
+  // 3. Unir al usuario
+  await db.from('usuarios_torneos').insert([{ 
+    usuario_email: user.email, 
+    torneo_id: liga.id 
+  }]);
+  
+  alert(`¡Torneo creado! Código: ${codigo}`);
   cargarEstadoTorneo();
 }
-
-async function unirseTorneo() {
-  const codigo = prompt('Ingresá el código de 6 letras que te pasó tu amigo:'); if(!codigo) return;
-  const { data: liga } = await db.from('ligas').select('id').eq('codigo_acceso', codigo.toUpperCase()).single();
-  if(!liga) return alert('Código inválido. Revisalo y volvé a intentar.');
-  
-  await db.from('usuarios_torneos').insert([{ usuario_email: currentUser.email, torneo_id: liga.id }]);
-  alert('¡Te uniste al torneo exitosamente!');
-  cargarEstadoTorneo();
+;
 }
 
 // ─── PICKS ───────────────────────────────────────────────────────────────────
